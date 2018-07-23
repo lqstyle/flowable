@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kpmg.cdd.repository.DocumentMapper" >
+  <resultMap id="BaseResultMap" type="com.kpmg.cdd.entity.Document" >
+    <result column="id_" property="id" jdbcType="VARCHAR" />
+    <result column="case_id_" property="caseId" jdbcType="VARCHAR" />
+    <result column="name_" property="name" jdbcType="VARCHAR" />
+    <result column="type_" property="type" jdbcType="VARCHAR" />
+    <result column="upload_url_" property="uploadUrl" jdbcType="VARCHAR" />
+    <result column="user_name_" property="userName" jdbcType="VARCHAR" />
+    <result column="activity_id_" property="activityId" jdbcType="VARCHAR" />
+    <result column="status_" property="status" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List">
+      id_, case_id_, name_, type_, upload_url_, user_name_,activity_id_,status_
+  </sql>  
+  <insert id="insert" parameterType="com.kpmg.cdd.entity.Document" >
+    insert into document (id_, case_id_, name_, 
+      type_, upload_url_, user_name_,activity_id_,status_
+      )
+    values (#{id,jdbcType=VARCHAR}, #{caseId,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},
+      #{type,jdbcType=VARCHAR}, #{uploadUrl,jdbcType=VARCHAR}, #{userName,jdbcType=VARCHAR}, #{activityId,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}
+      )
+  </insert>
+
+  <select id="selectByCaseId" parameterType="String" resultMap="BaseResultMap">
+      SELECT
+      <include refid="Base_Column_List"/>
+      from document WHERE
+      case_id_ =#{caseId}
+
+  </select>
+    <select id="selectById" parameterType="String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        from document WHERE
+        id_ =#{id}
+    </select>
+  
+  <update id="updateUploadUrl" parameterType="com.kpmg.cdd.entity.Document">
+    update document
+    set
+     upload_url_ = #{uploadUrl,jdbcType=VARCHAR},
+     status_ = #{status,jdbcType=VARCHAR},
+     type_ =#{type,jdbcType=VARCHAR}
+    where id_ = #{id,jdbcType=VARCHAR}
+  </update>
+
+  <update id="deleteListByActivity">
+   delete from document where activity_id_ =#{activityId} and case_id_ =#{caseId}
+  </update>
+</mapper>

@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kpmg.cdd.repository.CaseInfoMapper">
+    <resultMap id="BaseResultMap" type="com.kpmg.cdd.entity.CaseInfo">
+        <id column="ID_" property="id" jdbcType="VARCHAR"/>
+        <result column="TASK_ID_" property="taskId" jdbcType="VARCHAR"/>
+        <result column="CASE_KEY_" property="caseKey" jdbcType="VARCHAR"/>
+        <result column="CREATER_" property="creater" jdbcType="VARCHAR"/>
+        <result column="STATUS_" property="status" jdbcType="VARCHAR"/>
+        <result column="CREATE_TIME_" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="CLAIMED_TIME_" property="claimedTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        ID_, TASK_ID_, CASE_KEY_, CREATER_, STATUS_, CREATE_TIME_, CLAIMED_TIME_
+    </sql>
+
+    <insert id="insert" parameterType="com.kpmg.cdd.entity.CaseInfo">
+        insert into case_info (ID_, TASK_ID_, CASE_KEY_,
+        CREATER_, STATUS_, CREATE_TIME_,
+        CLAIMED_TIME_)
+        values (#{id,jdbcType=VARCHAR}, #{taskId,jdbcType=VARCHAR}, #{caseKey,jdbcType=VARCHAR},
+        #{creater,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+        #{claimedTime,jdbcType=TIMESTAMP})
+    </insert>
+
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from case_info
+        where ID_ = #{id,jdbcType=VARCHAR}
+    </select>
+
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.kpmg.cdd.entity.CaseInfo">
+        update case_info
+        <set>
+            <if test="taskId != null">
+                TASK_ID_ = #{taskId,jdbcType=VARCHAR},
+            </if>
+            <if test="caseKey != null">
+                CASE_KEY_ = #{caseKey,jdbcType=VARCHAR},
+            </if>
+            <if test="creater != null">
+                CREATER_ = #{creater,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                STATUS_ = #{status,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                CREATE_TIME_ = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="claimedTime != null">
+                CLAIMED_TIME_ = #{claimedTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where ID_ = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.kpmg.cdd.entity.CaseInfo">
+        update case_info
+        set TASK_ID_ = #{taskId,jdbcType=VARCHAR},
+        CASE_KEY_ = #{caseKey,jdbcType=VARCHAR},
+        CREATER_ = #{creater,jdbcType=VARCHAR},
+        STATUS_ = #{status,jdbcType=VARCHAR},
+        CREATE_TIME_ = #{createTime,jdbcType=TIMESTAMP},
+        CLAIMED_TIME_ = #{claimedTime,jdbcType=TIMESTAMP}
+        where ID_ = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <select id="getCaseList" parameterType="map" resultType="map">
+        SELECT
+        c.CASE_KEY_ AS caseKey,
+        n.address_ AS address,
+        n.country_ AS country,
+        n.province_ AS province,
+        n.email_ AS email,
+        n.name_ AS clientName,
+        n.phone_ AS phone,
+        n.entity_type_ AS entityType,
+        c.CREATER_ AS creater,
+        c.CREATE_TIME_ createTime,
+        c.CLAIMED_TIME_ claimTime,
+        t.ID_ AS taskId,
+        t.PROC_DEF_ID_ AS processDefinitionId,
+        t.PROC_INST_ID_ AS processInstanceId,
+        t.assignee_ AS assignee,
+        t.form_key_ as formKey,
+        c.id_ as caseId,
+        t.name_ as taskName
+        FROM
+        case_info c,
+        client n,
+        act_hi_procinst p,
+        act_ru_task t
+        INNER JOIN ACT_RU_IDENTITYLINK I ON I.TASK_ID_ = t.ID_
+        WHERE
+        <if test="clientName != null and clientName !=''">
+            n.name_  like CONCAT('%',#{clientName,jdbcType=VARCHAR},'%' ) and
+        </if>
+        <if test="entityType != null and entityType !=''">
+            n.entity_type_ = #{entityType,jdbcType=VARCHAR} and
+        </if>
+        p.business_key_ = c.case_key_
+        AND t.proc_inst_id_ = p.proc_inst_id_
+        AND c.ID_ = n.case_id_
+        AND (
+        <if test="userId != null and userId !=''">
+            t.ASSIGNEE_ =#{userId,jdbcType=VARCHAR}
+        </if>
+        OR (
+        t.ASSIGNEE_ IS NULL
+        AND I.TYPE_ = 'candidate'
+        AND (
+        I.GROUP_ID_ IN (
+        SELECT
+        s.group_id_
+        FROM
+        act_id_membership s
+        WHERE
+        <if test="userId != null and userId !=''">
+             s.user_id_ =#{userId,jdbcType=VARCHAR}
+        </if>
+        )
+        )
+        )
+        )
+        AND t.SUSPENSION_STATE_ = 1
+        ORDER BY
+        t.create_time_ ASC
+    </select>
+
+    <select id="getCaseHistory" parameterType="map" resultType="map">
+       SELECT
+            c.id_ AS id,
+            c.case_id_ as caseId,
+            c.name_ as clientName,
+            c.industry_ as industry,
+            c.phone_ as phone,
+            c.email_ as email,
+            c.faxNo_ as faxNo,
+            c.country_ as country,
+            c.province_ as province,
+            c.address_ as address,
+            c.entity_type_ as entityType,
+            c.result_state_ as resultState,
+            i.proc_inst_id_ as processInstanceId,
+            i.proc_def_id_ as processDefinitionId,
+            i.start_time_ as startTime,
+            i.end_time_ as endTime,
+            case when t.name_  is NULL
+            then 'Completed'
+            else t.name_
+            end taskName,
+            t.assignee_ as assingee
+            FROM
+            client c
+            inner join
+            act_hi_procinst i on i.business_key_  = c.case_id_
+            left join act_ru_task t on t.proc_inst_id_=i.id_
+        where
+        <if test="clientName != null and clientName !=''">
+            c.name_  like CONCAT('%',#{clientName,jdbcType=VARCHAR},'%' ) and
+        </if>
+        <if test="entityType != null and entityType !=''">
+            c.entity_type_ = #{entityType,jdbcType=VARCHAR} and
+        </if>
+            c.case_id_=i.business_key_
+        ORDER BY
+        i.start_time_ desc
+    </select>
+
+    <select id="selectByExample" parameterType="com.kpmg.cdd.entity.CaseInfo" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        from case_info WHERE 1=1
+        <if test="id != null and id !=''">
+            and id_ =#{id}
+        </if>
+        <if test="caseKey != null and caseKey !=''">
+            and case_key_ =#{caseKey}
+        </if>
+        <if test="taskId != null and taskId !=''">
+            and task_id_ =#{taskId}
+        </if>
+    </select>
+
+    <update id="updateTaskId" parameterType="com.kpmg.cdd.entity.CaseInfo">
+        update case_info
+        set
+        TASK_ID_ = #{taskId,jdbcType=VARCHAR}
+        where ID_ = #{id,jdbcType=VARCHAR}
+    </update>
+
+</mapper>

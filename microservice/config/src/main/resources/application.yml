@@ -1,0 +1,18 @@
+server:
+  port: 9001
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: http://10.119.169.7/cdd-2.0-poc/config.git
+          search-paths:
+            - rules
+            - processes
+          username: jsoutao
+          password: '{cipher}440d3b8547967217716ee33a1fefe0495403d7a5b565d71164e72e172a8cac28'
+logging:
+  level:
+    root: warn

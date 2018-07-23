@@ -1,0 +1,87 @@
+server:
+  port: 8081
+  undertow:
+    accesslog:
+      enabled: false
+  servlet:
+    session:
+      cookie:
+        name: kpmg-authentication
+
+spring:
+  application:
+    name: cdd
+  cloud:
+    config:
+      uri: http://127.0.0.1:9001
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://10.119.169.2:3306/cdd_2_0_dev_dmn?characterEncoding=utf8
+    username: root
+    password: Kpmg#123
+    sql-script-encoding: UTF-8
+    druid:
+      max-active: 20
+      min-idle: 5
+      max-wait: 10000
+      #pool-prepared-statements:
+      #max-pool-prepared-statement-per-connection-size:
+      #max-open-prepared-statements:  #和上面的等价
+      validation-query:  SELECT 1 FROMDUAL
+      #validation-query-timeout: 30000
+      test-on-borrow: false
+      test-on-return: false
+      test-while-idle: true
+      #time-between-eviction-runs-millis: 6000
+      #min-evictable-idle-time-millis: 30000
+      #max-evictable-idle-time-millis: 60000
+      filters: stat,wall,slf4j
+      filter:
+        slf4j:
+          statement-executable-sql-log-enable: true
+
+mybatis:
+  type-aliases-package: com.kpmg.cdd.repository
+  mapper-locations:
+    - classpath:mapper/*.xml
+    - classpath:META-INF/modeler-mybatis-mappings/*.xml
+    - classpath:META-INF/admin-mybatis-mappings/*.xml
+  configuration-properties:
+    prefix : ''
+    blobType : BLOB
+
+flowable:
+  async-executor-activate: false
+  app:
+    deploy-resources: false
+  cmmn:
+    deploy-resources: false
+  dmn:
+    deploy-resources: false
+  form:
+    deploy-resources: false
+  history-level: full
+  database-schema-update: false
+  common:
+    app:
+      idm-url: "a"
+      idm-admin:
+        user: "a"
+        password: "a"
+  admin:
+    app:
+      security:
+        encryption:
+          credentials-i-v-spec: kpmg9ieu8rsiorrf
+          credentials-secret-spec: kpmg9ieu8rsiorrf
+  check-process-definitions: false
+  modeler:
+    app:
+      deployment-api-url: http://localhost:8081/app-api
+  mail:
+    server:
+      default-from: do-not-reply@kpmg.km
+      host: 10.166.126.22
+      port: 25
+file:
+  upload-path: C:/upload/

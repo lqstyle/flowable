@@ -1,0 +1,42 @@
+package com.kpmg.cdd
+import com.kpmg.cdd.entity.Client;
+
+rule "derict sanctioned"
+when
+    $client : Client(["North Korea", "Iran", "Cuba", "Syria", "Burma"] contains country)
+then
+	$client.setResultState("sanctioned");
+end
+
+rule "USA"
+when
+    $client : Client(country == "USA")
+then
+    $client.addDocument("Form-test");
+	$client.addDocument("Form 8938");
+	$client.addDocument("Form 114");
+	$client.setResultState("fatca");
+end
+
+rule "corporate"
+when
+    $client : Client(entityType == "corporate")
+then
+	$client.addDocument("Business Registration Certificate");
+	$client.addDocument("UBO ID");
+	$client.addDocument("UBO Proof of Address");
+	$client.addDocument("UBO Nationality");
+	$client.setResultState("corporate");
+end
+
+rule "npo"
+when
+    $client : Client(entityType == "npo")
+then
+	$client.addDocument("Certificate of Registration");
+	$client.addDocument("Society Form 1");
+	$client.addDocument("Constitution");
+	$client.addDocument("AS Proof of Address");
+	$client.addDocument("AS Nationality");
+	$client.setResultState("npo");
+end

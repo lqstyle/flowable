@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kpmg.cdd.repository.ExternalSysResultMapper">
+    <resultMap id="BaseResultMap" type="com.kpmg.cdd.entity.ExternalSysResult">
+        <result column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="case_id" property="caseId" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="commit_time" property="commitTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, case_id, name, content, commit_time
+  </sql>
+
+    <insert id="insert" parameterType="com.kpmg.cdd.entity.ExternalSysResult">
+    insert into external_sys_result (id, case_id, name, 
+      content, commit_time)
+    values (#{id,jdbcType=VARCHAR}, #{caseId,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},
+      #{content,jdbcType=VARCHAR}, #{commitTime,jdbcType=TIMESTAMP})
+  </insert>
+
+    <select id="getSingleExternalSysResult" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        from external_sys_result WHERE id =#{id,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getExternalSysResultList" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        from external_sys_result WHERE case_id =#{caseId,jdbcType=VARCHAR}
+    </select>
+
+
+    <update id="updateByPrimaryKey" parameterType="com.kpmg.cdd.entity.ExternalSysResult">
+        update external_sys_result
+        set  case_id = #{caseId,jdbcType=VARCHAR},
+        name = #{name,jdbcType=VARCHAR},
+        content = #{content,jdbcType=VARCHAR},
+        commit_time = #{commitTime,jdbcType=TIMESTAMP}
+        where ID = #{id,jdbcType=VARCHAR}
+    </update>
+
+</mapper>

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kpmg.cdd.repository.ClientMapper">
+    <resultMap id="BaseResultMap" type="com.kpmg.cdd.entity.Client">
+        <result column="id_" property="id" jdbcType="VARCHAR"/>
+        <result column="case_id_" property="caseId" jdbcType="VARCHAR"/>
+        <result column="name_" property="name" jdbcType="VARCHAR"/>
+        <result column="industry_" property="industry" jdbcType="VARCHAR"/>
+        <result column="phone_" property="phone" jdbcType="VARCHAR"/>
+        <result column="email_" property="email" jdbcType="VARCHAR"/>
+        <result column="faxNo_" property="faxNo" jdbcType="VARCHAR"/>
+        <result column="country_" property="country" jdbcType="VARCHAR"/>
+        <result column="province_" property="province" jdbcType="VARCHAR"/>
+        <result column="address_" property="address" jdbcType="VARCHAR"/>
+        <result column="entity_type_" property="entityType" jdbcType="VARCHAR"/>
+        <result column="result_state_" property="resultState" jdbcType="VARCHAR"/>
+    </resultMap>
+    <!-- basic column-->
+    <sql id="Base_Column_List">
+        id_, case_id_, name_, industry_, phone_, email_, faxNo_, country_, province_, address_,
+        entity_type_, result_state_
+    </sql>
+
+    <!-- insert into client-->
+    <insert id="insert" parameterType="com.kpmg.cdd.entity.Client">
+    insert into client (id_, case_id_, name_,
+      industry_, phone_, email_,
+      faxNo_, country_, province_,
+      address_, entity_type_, result_state_ )
+    values (#{id,jdbcType=VARCHAR}, #{caseId,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},
+      #{industry,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},
+      #{faxNo,jdbcType=VARCHAR}, #{country,jdbcType=VARCHAR}, #{province,jdbcType=VARCHAR},
+      #{address,jdbcType=VARCHAR}, #{entityType,jdbcType=VARCHAR}, #{resultState,jdbcType=VARCHAR} )
+  </insert>
+
+    <!-- update   client-->
+    <update id="updateByExample" parameterType="map">
+        update client
+        set id_ = #{record.id,jdbcType=VARCHAR},
+        case_id_ = #{record.caseId,jdbcType=VARCHAR},
+        name_ = #{record.name,jdbcType=VARCHAR},
+        industry_ = #{record.industry,jdbcType=VARCHAR},
+        phone_ = #{record.phone,jdbcType=VARCHAR},
+        email_ = #{record.email,jdbcType=VARCHAR},
+        faxNo_ = #{record.faxNo,jdbcType=VARCHAR},
+        country_ = #{record.country,jdbcType=VARCHAR},
+        province_ = #{record.province,jdbcType=VARCHAR},
+        address_ = #{record.address,jdbcType=VARCHAR},
+        entity_type_ = #{record.entityType,jdbcType=VARCHAR},
+        result_state_ = #{record.resultState,jdbcType=VARCHAR}}
+        where 1=1
+        <if test="id != null">
+            and ID_ = #{id,jdbcType=VARCHAR}
+        </if>
+        <if test="caseId != null">
+            and case_id_ = #{caseId,jdbcType=VARCHAR}
+        </if>
+    </update>
+
+    <!-- get Multiple table info-->
+    <select id="getClientList" parameterType="map" resultType="map">
+        SELECT
+        t.case_id_ caseId,
+        t.address_ address,
+        t.country_ country,
+        t.email_ email,
+        t.entity_type_ entity_type,
+        t.faxNo_ faxNo,
+        t.id_ clientId,
+        t.industry_ industry,
+        t.name_ clientName,
+        t.phone_ phone,
+        t.province_ province,
+        t.result_state_ result_state,
+        l.STATUS_ caseStatus,
+        l.CREATE_TIME_ createTime,
+        l.CLAIMED_TIME_ claimedTime,
+        l.TASK_ID_ taskId
+        FROM
+        case_info l
+        INNER JOIN client t ON t.case_id_ = l.ID_
+        WHERE
+        1 = 1
+        <if test="caseId != null and caseId !=''">
+            and l.id_ =#{caseId}
+        </if>
+        ORDER BY l.create_time_ ASC
+    </select>
+
+    <!-- get single table info-->
+    <select id="selectByExample" parameterType="com.kpmg.cdd.entity.Client" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        from client WHERE 1=1
+        <if test="id != null and id !=''">
+            and id_ =#{id}
+        </if>
+        <if test="caseId!= null and caseId !=''">
+            and case_id_ =#{caseId}
+        </if>
+    </select>
+
+    <select id="getSingleClient" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        from client WHERE case_id_ =#{caseId,jdbcType=VARCHAR}
+    </select>
+
+
+    <update id="updateClientState" parameterType="map">
+        update client
+        set
+        result_state_ = #{resultState,jdbcType=VARCHAR}
+        where case_id_ = #{caseId,jdbcType=VARCHAR}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.kpmg.cdd.entity.Client">
+        update client
+        set CASE_ID_ = #{caseId,jdbcType=VARCHAR},
+        name_ = #{name,jdbcType=VARCHAR},
+        industry_ = #{industry,jdbcType=VARCHAR},
+        phone_ = #{phone,jdbcType=VARCHAR},
+        email_ = #{email,jdbcType=VARCHAR},
+        faxNo_ = #{faxNo,jdbcType=VARCHAR},
+        country_ = #{country,jdbcType=VARCHAR},
+        province_ = #{province,jdbcType=VARCHAR},
+        address_ = #{address,jdbcType=VARCHAR},
+        entity_type_ = #{entityType,jdbcType=VARCHAR},
+        result_state_ = #{resultState,jdbcType=VARCHAR}
+        where ID_ = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <update id="updateResultStateById">
+        update client
+        set  result_state_ = #{resultState,jdbcType=VARCHAR}
+        where ID_ = #{id,jdbcType=VARCHAR}
+    </update>
+
+</mapper>
